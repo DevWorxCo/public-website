@@ -1,0 +1,92 @@
+---
+layout: post
+title: Apache Spark on Java 11
+date: 2019-08-12 16:00:00.000
+tags: blog
+author: jsteenkamp
+---
+
+Java 11 is the latest https://www.oracle.com/technetwork/java/java-se-support-roadmap.html[Long-Term-Support] release version and all users are actively encouraged to upgrade. Hopefully, if you are still running Java 8 (or earlier) at this point, you have already started looking at some of the https://winterbe.com/posts/2018/08/29/migrate-maven-projects-to-java-11-jigsaw/[upgrade strategies] available. There are excellent https://dzone.com/articles/java-and-the-jdks-which-one-to-use[distributions] available for you to choose from.
+
+Unfortunately, some of the libraries and frameworks I use on a daily basis (such as https://spark.apache.org/[Apache Spark]) is not quite ready yet as far as Java 11 support is concerned.  While Spark will eventually have seamless support for Java 11, I prefer to move forward with the upgrade and integrate early rather than delay until the new version is available. This blog gives some details on the _'workaround'_ I used to get around this issue. 
+   
+== The Issue
+
+When running Spark jobs with on Java 11 (I use https://aws.amazon.com/corretto/[Corretto]) you very quickly run into something like the following:
+
+[source,text]
+----
+java.lang.IllegalArgumentException: Unsupported class file major version 55
+	at org.apache.xbean.asm6.ClassReader.<init>(ClassReader.java:166)
+	at org.apache.xbean.asm6.ClassReader.<init>(ClassReader.java:148)
+	at org.apache.xbean.asm6.ClassReader.<init>(ClassReader.java:136)
+	at org.apache.xbean.asm6.ClassReader.<init>(ClassReader.java:237)
+	at org.apache.spark.util.ClosureCleaner$.getClassReader(ClosureCleaner.scala:49)
+	at org.apache.spark.util.FieldAccessFinder$$anon$3$$anonfun$visitMethodInsn$2.apply(ClosureCleaner.scala:517)
+	at org.apache.spark.util.FieldAccessFinder$$anon$3$$anonfun$visitMethodInsn$2.apply(ClosureCleaner.scala:500)
+	at scala.collection.TraversableLike$WithFilter$$anonfun$foreach$1.apply(TraversableLike.scala:733)
+	at scala.collection.mutable.HashMap$$anon$1$$anonfun$foreach$2.apply(HashMap.scala:134)
+----
+
+This happens whether you are running Spark as an embedded library or using the Spark command line tools.
+
+In my experience, it always comes down to the `org.apache.xbean.asm6.ClassReader` class in the `xbean-asm6-shaded-4.8.jar` library.
+  
+== Temporary Workaround
+
+Simple as it may seem - there is a check in one of the package private constructors that all others delegate down to:
+
+[source,java]
+----
+package org.apache.xbean.asm6;
+...
+public class ClassReader {
+
+ClassReader(
+   final byte[] classFileBuffer, final int classFileOffset, final boolean checkClassVersion) {
+ this.b = classFileBuffer;
+ // Check the class' major_version. This field is after the magic and minor_version fields, which
+ // use 4 and 2 bytes respectively.
+ if (checkClassVersion && readShort(classFileOffset + 6) > Opcodes.V10) {
+   throw new IllegalArgumentException(
+       "Unsupported class file major version " + readShort(classFileOffset + 6));
+ }
+...
+}
+----
+
+The workaround that I have employed (and which seems to work, somewhat to my surprise) was to update the `checkClassVersion` parameter where it is passed in (line 148). It would appear, at least for my usage of Spark, that this check is not mandatory. There also doesn't seem to be any flag (say a system property or environment variable) that can be set to skip this check - hence we have to resort to changing this in the code itself.
+
+For this change to take effect, you need to ensure that this new version is loaded instead. For Apache Spark 2.4.3 I created a new version of the `xbean-asm6-shaded-4.8.jar` library (which you can link:/assets/jars/xbean-asm6-shaded-4.8.jar[download here]) which I use to replace the version in the `jars` directory. In the embedded case, I make sure that this class gets first (by including it, source code, package name and all) in my project.  
+
+== Caveat Emptor !
+
+While the workaround described above has been successful in the projects I have been involved with which uses Spark in a particular way, there is no guarantee (at least until we get an attested version) that it will work for your use cases. 
+
+As always, be sure to thoroughly test this on your own stack first before deployment to get comfortable it will function as expected.
+
+== Other Libraries / Frameworks that has Issues Java 11?
+
+We have also encountered similar issues using https://nifi.apache.org/[Apache Nifi] with Java 11 - albeit with the slight twist that in addition to the workaround above, you also need to deal with the fact that https://openjdk.java.net/jeps/320[JAXB is no longer part of the core Java distribution].  
+
+Although the details on making Apache Nifi work on Java 11 probably warrants its own blog post.
+
+== Contact
+
+I would be interested to hear your thoughts on this and other topics. Feel free to link:/contact[get in touch]. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

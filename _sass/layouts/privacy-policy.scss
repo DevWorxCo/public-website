@@ -1,0 +1,58 @@
+body.privacy-policy,
+body.post {
+  background-image: url($baseurl + '/assets/images/bg-getting-started.jpg');
+  background-repeat: no-repeat;
+  background-size: 100%;
+}
+
+.privacy-policy-page {
+  .privacy-policy-list-item {
+    margin-bottom: 5rem;
+    p {
+      margin: 0;
+    }
+
+    .post-title {
+      h2 {
+        margin: 0;
+        a{
+          color: $white;
+          text-decoration: none;
+          font-weight: 100;
+          text-transform: uppercase;
+        }
+      }
+    }
+  }
+}
+
+.privacy-policy-page, .privacy-policy-page {
+  .byline-wrapper {
+    display: flex;
+    align-items:center;
+  }
+  .headshot, .byline {
+    display: inline;
+  }
+  .headshot {
+    max-width: 2.5rem;
+    border-radius: 1.5rem;
+    margin-right: .5rem;
+  }
+  .share-page {
+    text-align: right;
+  }
+}
+
+.privacy-policy-page {
+  .byline-wrapper {
+    p {
+      margin: 0;
+    }
+  }
+}
+
+ 
+.privacy-policy-page  {
+  margin-bottom: 6rem;
+}

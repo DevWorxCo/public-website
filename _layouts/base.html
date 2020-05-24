@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>{{ page.title }}</title>
+
+  <script src="{{ '/assets/javascript/highlightjs-pack.js' | relative_url }}" type="text/javascript"></script>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="{% if page.description %}{{ page.description }}{% else %}{{ site.description }}{% endif %}">
+  <link rel="shortcut icon" type="image/png" href="{{ '/favicon.ico' }}" >
+  <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}" />
+  <link rel="stylesheet" href="{{ '/assets/css/cookieBubble.css' | relative_url }}" />
+
+</head>
+
+<body class="{% if page.url == '/' %}homepage{% else %}{{page.layout}}{% endif %}">
+
+  <div class="content">
+    {% include header-navigation.html %}
+    {{ content }}
+  </div>
+
+  {% include project-footer.html %}
+  {% include devworx-footer.html %}
+
+
+  <script type="text/javascript" src="{{ '/assets/javascript/jquery-3.4.1.min.js' | relative_url }}"></script>
+  <script type="text/javascript" src="{{ '/assets/javascript/mobile-nav.js' | relative_url }}"></script>
+  <script type="text/javascript" src="{{ '/assets/javascript/scroll-down.js' | relative_url }}"></script>
+  <script src="{{ '/assets/javascript/satellite.js' | relative_url }}" type="text/javascript"></script>
+  <script type="text/javascript" src="{{ '/assets/javascript/cookieBubble.min.js' | relative_url }}"></script>
+  
+  <script>
+            (function ($) {
+                    $.cookieBubble(
+                        {
+
+                        iconVisibility: false,
+
+                        cookiePolicyButtonUrl:'https://www.devworx.co.uk/privacy-policy/index.html',
+                        cookiePolicyButtonTarget:'_blank',
+                        cookiePolicyButtonText: "Read Our Privacy Policy",
+                        
+                        
+                        buttonText: "Agree",
+                        buttonColor:'#195A8F',
+                        
+                        messageTextColor: "FFFFFF",
+                       // messageText: "We use cookies to provide the services and features offered on our website, and to improve our user experience. By using this website you agree to our use of these cookies as explained in our privacy policy.",
+                        
+                    });
+            })(jQuery);
+        </script>
+  
+</body>
+	
+</html>

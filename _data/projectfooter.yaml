@@ -1,0 +1,25 @@
+footer_text: "DevWorx Ltd. is a private company based in London, UK. Registration number 12011447."
+
+links:
+  - title: 
+    subfolderitems:
+      - page: 
+        url: 
+  - title: 
+    subfolderitems:
+      - page: Home
+        url: /
+  - title: 
+    subfolderitems:
+      - page: About
+        url: /#about
+  - title: 
+    subfolderitems:
+      - page: Contact
+        url: /contact/index.html
+  - title: 
+    subfolderitems:
+      - page: Blog
+        url: /blog/index.html
+
+        

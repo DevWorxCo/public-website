@@ -1,0 +1,27 @@
+.devworx-footer {
+  background-color: $black;
+
+  .grid-wrapper { padding: .5rem 0; }
+
+  .licence {
+    grid-column: 5/9;
+    align-self: center;
+    justify-self: center;
+    a {
+      color: $white;
+      font-size: .75rem;
+      font-weight: 200;
+    }
+    @media screen and (max-width: 1024px) {
+      grid-column: 1/5;
+      justify-self: left;
+    }
+    @media screen and (max-width: 480px) {
+      grid-column: 1/13;
+      justify-self: center;
+      order: 3;
+    }
+  }
+
+
+}

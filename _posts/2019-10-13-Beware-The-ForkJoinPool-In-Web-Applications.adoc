@@ -1,0 +1,114 @@
+---
+layout: post
+title: Beware - The Java ForkJoinPool in Web Applications.
+date: 2019-10-13 12:00:00.000
+tags: [java, ForkJoinPool, Web Applications]
+author: jsteenkamp
+---
+
+The behaviour of Java's `ForkJoinPool` is not always what it seems when you use it in a web application hosted in link:https://tomcat.apache.org/[Apache Tomcat] / link:https://www.eclipse.org/jetty/[Jetty] and can lead to some surprising consequences.      
+
+In this blog we explore some  'missing classpath resource' issues that can be caused by reliance on the `ForkJoinPool` Classloader in Web Applications. 
+     
+== The Mystery of the Missing Classpath Resources
+
+Embedding resources in your classpath is a typical way to ensure that you can access important files in a platform-agnostic and to avoid the many idiosyncrasies specific to each operating system implementation. 
+
+In addition, you may consider using Java's built-in `ForkJoinPool` and not spawn your own thread pool in order to avoid what has been described as the link:https://stackoverflow.com/a/33704032[tragedy of the commons]. 
+
+This can lead to some unforseen consequences, however. Consider the following code example and output:
+
+[source,java]
+----
+@WebServlet("/")
+public class ForkJoinPoolResourceServlet extends HttpServlet
+{
+  public static final String CLASSPATH_RESOURCE = "devworx-resource/document.txt";
+  
+  @Override
+  protected void doGet(   HttpServletRequest req, 
+              HttpServletResponse resp) throws ServletException, IOException
+  {
+    final PrintWriter writer = resp.getWriter();
+    writer.write("<html>");
+    
+    writer.write("<h2>(1) - " + CLASSPATH_RESOURCE + " is : " + 
+           getContent( Thread.currentThread().getContextClassLoader().getResourceAsStream(CLASSPATH_RESOURCE)) +
+           "</h2>");
+    
+    writer.write("<h2>(1) - ClassLoader: " + 
+            Thread.currentThread().getContextClassLoader() + // List my class loader
+            "</h2>");
+   
+    ForkJoinTask<?> task = ForkJoinPool.commonPool().submit(() -> 
+    {
+      writer.write("<h2>(2) - " + CLASSPATH_RESOURCE + " is : " + 
+              getContent( Thread.currentThread().getContextClassLoader().getResourceAsStream(CLASSPATH_RESOURCE)) +  
+             "</h2>");
+      
+      writer.write("<h2>(2) - ClassLoader: " + 
+            Thread.currentThread().getContextClassLoader() + 
+            "</h2>");
+    });
+    ...
+    task.get();
+    ..
+    writer.write("</html>");
+  }
+  
+  private String getContent(InputStream ins)
+  {
+    try
+    {
+      if(ins == null) return "NULL";
+      else return IOUtils.toString(ins, "UTF-8");
+    } 
+    catch (IOException e)
+    {
+      throw new RuntimeException("Unexpected error ! - " + e, e);
+    }
+  }
+}
+----
+
+First time you load this page, you get:
+
+image::/assets/posts/beware-the-forkjoinpool/forkjoinpool-first-load.png[Fork Join Pool - First Load]
+
+But then when you refresh - you get the following:
+
+image::/assets/posts/beware-the-forkjoinpool/forkjoinpool-second-load.png[Fork Join Pool - Second Load]
+
+In this relatively simple example this is not an issue. However, as part of a much bigger application and workflow this can cause serious issues.  
+
+== The Switching of Contexts
+
+From the example above, it is clear that the `ContextClassLoader` changes over the course of the application's deployment. And certainly, looking at some of the link:https://tomcat.apache.org/tomcat-9.0-doc/class-loader-howto.html[Tomcat Resources] on class loading - it becomes clear why relying on a common pool (which may be loaded as part of the Bootstrap or System ClassLoaders) is best avoided.
+
+This particular nuance proved to be quite a costly delay in the development of my project. Hence an important lesson from this experience:
+
+TIP: Be in control of your own thread pools and classloader contexts. Be aware that behaviour in your test case runtime may be radically different from the behaviour in the runtime of a container.
+
+== Reference Project
+
+For the source code used in this blog, please refer to: https://github.com/DevWorxCo/forkjoinpool-blog
+
+== Contact
+
+I would be interested to hear your thoughts on this and other topics. Feel free to link:/contact[get in touch]. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

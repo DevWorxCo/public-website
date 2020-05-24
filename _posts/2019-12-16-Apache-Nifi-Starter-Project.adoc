@@ -1,0 +1,54 @@
+---
+layout: post
+title: Apache Nifi Starter Project - Overcome Blank Canvas Inertia  
+date: 2019-12-16 08:00:00.000
+tags: [java, Apache Nifi, Starter Project, Deutsche Börse, Python ]
+author: jsteenkamp
+---
+
+https://nifi.apache.org/[Apache Nifi] is a powerful addition to any developer's toolkit. Creating and managing data processing pipelines are an almost inevitable fact of life when working on modern platforms. Recent trends in machine learning and data science are only reinforcing this paradigm. Don't succumb to the temptation of developing your own data loading framework or pipeline - this comes with ongoing hidden costs as you continually end up having to reinvent solutions to typical data loading and operational problems.
+
+https://nifi.apache.org/[Apache Nifi] is mature, open source and has built in support for most libraries, APIs and systems you need to integrate with. It has something for everyone - there is a visual web based interface for high level non-technical users to interact with a system flow along with feature rich API and extension framework allowing customisation, orchestration and automation by more advanced users.     
+     
+== Blank Canvas Inertia
+
+As feature rich as it is, Apache Nifi can be a victim of its own success. For instance, when you follow the instruction on the website and get an instance up running you are presented with the following blank canvas:
+
+image::/assets/posts/apache-nifi-starter-project/apache-nifi-blank-canvas.png[Apache Nifi Blank Canvas]
+
+Finding where to start can be daunting. Clicking on the "Add Processor" option does not really help - you are inundated with 285 options:
+
+image::/assets/posts/apache-nifi-starter-project/apache-nifi-processor-selection.png[Apache Nifi Processor Selection]
+
+== Apache Nifi Starter Project
+
+Having an example that is easy to setup and explore can help to overcome 'blank canvas' inertia. To that end, I have created a project on GitHub that should get you up and running with a local Nifi instance and example flow in 3 steps:
+
+* Apache Nifi Starter Project - https://github.com/DevWorxCo/nifi-starter   
+
+The automatically deployed flow does the following:
+
+* Fetches from AWS S3 the freely available Deutsche Börse Public Dataset
+* Runs the CSV files through a custom Nifi Processor (nifi-dboerse-accumulator-nar - included as part of this project)
+* Invokes a Python script that takes the JSON summary produced by the above step and plots a chart.
+ 
+
+== Contact
+
+I would be interested to hear your feedback on this and other topics. Feel free to link:/contact[get in touch]. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

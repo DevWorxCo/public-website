@@ -1,0 +1,25 @@
+<div class="navigation-wrapper">
+  <div class="width-12-12">
+    <div class="header navigation">
+      <div class="logo-wrapper">
+        <a href="{{site.baseurl}}/"><img src="{{site.baseurl}}/assets/images/devworx-banner.png" class="project-logo" title="DevWorx"></a>
+      </div>
+      <div class="nav-container">
+        <nav>
+          <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+          <ul class="nav-list">
+            <li>
+              <a href="{{site.baseurl}}/#about" class="{% if page.url contains '/about/' %}active{% endif %}">About</a>
+            </li>
+            <li>
+              <a href="{{site.baseurl}}/contact/index.html" class="{% if page.url contains '/contact/' %}active{% endif %}">Contact</a>
+            </li>
+            <li>
+              <a href="{{site.baseurl}}/blog/index.html" class="{% if page.url contains '/blog/' %}active{% endif %}">Blog</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+</div>
