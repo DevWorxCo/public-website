@@ -145,7 +145,8 @@ The hourly cost of this instance is *$0.052 per hour* or given the current excha
 |*£ 1,077.48*
 |=== 
 
-=== Microsoft Azuree
+=== Microsoft Azure 
+ 
 For Microsoft Azure it is similarly tricky to find an exact match on the https://azure.microsoft.com/en-gb/pricing/details/virtual-machines/linux/#d-series[pricing page]. For the purposes of this discussion we will assume `Av2 Standard - A2 v2` which has 2 vCPU cores and 4GB of RAM (at least at the time of writing).
 
 The hourly cost of this instance is *£0.0791 per hour*. That means:
