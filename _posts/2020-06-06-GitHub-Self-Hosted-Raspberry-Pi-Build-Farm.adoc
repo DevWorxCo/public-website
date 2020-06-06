@@ -1,0 +1,209 @@
+---
+layout: post
+title: GitHub Self-Hosted Raspberry Pi Build Farm - Setup and Costs
+date: 2020-06-06 08:00:00.000
+tags: [GitHub, Raspberry Pi, Cloud Costs]
+author: jsteenkamp
+---
+
+The https://www.raspberrypi.org/[Raspberry Pi 4 Model B], on top of being a captivating hobby and educational device, is actually quite a serious piece of hardware. As the cliché goes, only a few years ago a 1.5GHz quad core processor with 4GB of RAM was more than enough for everybody. And with a low retail cost and power consumption footprint it is easy to see why for basic computing tasks the Raspberry Pi can serve as a more than adequate desktop replacement.
+
+Being a capable machine, the Respberry Pi can be applied to other use cases also. In this blog we will look at how it is possible to configure the Raspberry Pi to act as a https://help.github.com/en/actions/hosting-your-own-runners/about-self-hosted-runners[self-hosted runner] on https://github.com/[GitHub]. No blog on a self-hosted build would be complete without some cost comparisons to what is on offer from cloud providers (if only in this very limited, contrived situation).
+
+== The Raspberry Pi Cluster Setup
+
+The 3 Raspberry Pi 4 Model B machines that make up the cluster are of the 4GB memory variety and setup with https://www.raspberrypi.org/downloads/raspberry-pi-os/[Raspberry Pi OS]: 
+
+image::/assets/posts/github-self-hosted-raspberry-pi-build-farm/the-raspberry-pi-setup.png[The Cluster]
+
+The costs for setting up this particular cluster was as follows:
+
+[cols="3*>", options="header", width=100%]
+|===
+|Item
+|Quantity
+|Cost
+
+|Raspberry Pi 4 Model B - 4GB RAM
+|3 Units
+|£ 162
+
+|16GB  Panasonic Class 10 A1 Micro SD 
+|3 Units
+|£ 21
+
+| *Total*
+| 
+|*£ 183*
+|===
+
+== The GitHub Self-Hosted Runner Setup
+
+Setting up a GitHub self hosted runner was surprisingly easy to do. You will find the option to do so under the "Settings->Actions" section on your repository. The instructions are straightforward and tend to be a simple copy and paste to get going:
+
+image::/assets/posts/github-self-hosted-raspberry-pi-build-farm/self-hosted-runners.png[Summary of the Self-Hosted Runners]
+
+NOTE: When you add the self-hosted runners, be sure to open the page again for each one of your runners. The `--token` in the instructions varies ever so slightly each time the page is opened.
+
+As this is a self-hosted runner, you are required to set up your own local environment and toolchain. This particular example is a Java / https://vaadin.com/[Vaadin] based UI - so I had to download the ARM Java runtime from https://adoptopenjdk.net/ and https://maven.apache.org/[Apache Maven]. 
+
+=== Configuring the GitHub Workflow
+
+In my workflow I want to trigger a build every time I push code to the repository. This can be done by creating a file under the `.github/workflows` directory which details the workflow steps. For instance, in the case of this repository I have specified `maven-self-hosted.yml` :
+
+[source,yaml]
+----
+name: Java Build on Self Hosted Raspberry Pi
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: self-hosted
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build with Maven
+        run: mvn -B clean install --file pom.xml
+----
+
+Once this has been set up, GitHub will trigger this workflow whenever you push to the repository:
+
+image::/assets/posts/github-self-hosted-raspberry-pi-build-farm/github-workflow-self-hosted-build.png[The Triggered Workflow]
+
+== Self-Hosted Raspberry Pi vs. Cloud Hosted Costs
+
+Any comparisons to cloud hosted om this blog should, of course, be taken with a pinch of salt. The setup described in this blog is certainly not scalable and assume many variables (e.g. rent, reliability, bandwidth etc.) simply does not apply. That having been said - here are some annual running cost estimates (assuming 24/7 utilisation).
+
+=== The Raspberry Pi 
+
+Let's base this on the worst case - the Raspberry Pi power supply specifies an output of *5.1 Volts* and *3 Ampere*. That gives a total of *15.3 Watts* - which is no doubt a massive over estimation given the https://www.raspberrypi.org/documentation/faqs/#pi-power[Raspberry Pi documentation], but lets go with this. This means we consume at worst a total of *0.0153 kW h*.
+
+In London, the average cost of *1 kW h* comes to *£0.1317* average (at least according to the figures provided to me by https://sse.co.uk/[SSE] for the 25th of May to 4th of June 2020). That means the power consumption cost of a Raspberry Pi per hour is truely miniscule - *£0.00201501*
+ 
+[cols="a,a,a,a", options="header", width=100%]
+|===
+|Description
+|1 Hour Cost 
+|1 Day Cost
+|1 Year Cost
+
+| `pi-farm-01` - server
+|£ 0.00201501
+|£ 0.04836024
+|£ 17.6514876
+
+| `pi-farm-02` - server
+|£ 0.00201501
+|£ 0.04836024
+|£ 17.6514876
+
+| `pi-farm-03` - server
+|£ 0.00201501
+|£ 0.04836024
+|£ 17.6514876
+
+| *Total (rounded)*
+|*£ 0.01*
+|*£ 0.15*
+|*£ 52.95*
+|===
+
+=== Amazon Web Services EC2
+
+Finding an exact instance match on the https://aws.amazon.com/ec2/pricing/on-demand/[on-demand Amazon EC2 Pricing (London)] page is not that straightforward. For the purposes of this discussion we will assume `t2.medium` which has 2 vCPU cores and 4GB or RAM (at least at the time of writing).
+
+The hourly cost of this instance is *$0.052 per hour* or given the current exchange rates - *£0.041*. That means:
+
+[cols="a,a,a,a", options="header", width=100%]
+|===
+|Description
+|1 Hour Cost 
+|1 Day Cost
+|1 Year Cost
+
+| `aws-farm-01` - server
+|£ 0.041
+|£ 0.984
+|£ 359.16
+
+| `aws-farm-02` - server
+|£ 0.041
+|£ 0.984
+|£ 359.16
+
+| `aws-farm-03` - server
+|£ 0.041
+|£ 0.984
+|£ 359.16
+
+| *Total (rounded)*
+|*£ 0.12*
+|*£ 2.95*
+|*£ 1,077.48*
+|=== 
+
+=== Microsoft Azuree
+For Microsoft Azure it is similarly tricky to find an exact match on the https://azure.microsoft.com/en-gb/pricing/details/virtual-machines/linux/#d-series[pricing page]. For the purposes of this discussion we will assume `Av2 Standard - A2 v2` which has 2 vCPU cores and 4GB of RAM (at least at the time of writing).
+
+The hourly cost of this instance is *£0.0791 per hour*. That means:
+
+[cols="a,a,a,a", options="header", width=100%]
+|===
+|Description
+|1 Hour Cost 
+|1 Day Cost
+|1 Year Cost
+
+| `azure-farm-01` - server
+|£ 0.0791
+|£ 1.8984
+|£ 692.916
+
+| `azure-farm-02` - server
+|£ 0.0791
+|£ 1.8984
+|£ 692.916
+
+| `azure-farm-03` - server
+|£ 0.0791
+|£ 1.8984
+|£ 692.916
+
+| *Total (rounded)*
+|*£ 0.24*
+|*£ 5.70*
+|*£ 2,078.75*
+|===
+
+== Cost Verdict
+
+These figures indicate a saving up to *£ 800 a year* for an initial capital outlay of *£ 183*. Of course, we don't take into account bandwidth and/or property rent costs here. The 'Raspberry Pi Rack' is hosted in the home office, so these fixed cost happen regardless.   
+
+== Conclusion
+
+Hopefully this blog offered an amusing insight into how it is possible to set up a local Raspberry Pi build farm. The cost comparisons, while somewhat fanciful, does have a serious argument to make also about cloud computing costs.
+ 
+The convenience of cloud offerings come with a cost. Sure, there may be benefits from economy of scale or the additional reliability that these solutions provide - but that still requires one to know the true costs and trade-offs inherent for specific use cases.      
+
+== Contact
+
+I would be interested to hear your feedback on this and other topics. Feel free to link:/contact[get in touch]. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
