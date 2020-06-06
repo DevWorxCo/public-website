@@ -191,7 +191,7 @@ The convenience of cloud offerings come with a cost. Sure, there may be benefits
 
 == Contact
 
-I would be interested to hear your feedback on this and other topics. Feel free to link:/contact[get in touch]. 
+I would be interested to hear your feedback on this and other topics. Feel free to https://www.devworx.co.uk/contact/index.html[get in touch]. 
 
 
 

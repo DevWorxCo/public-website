@@ -73,7 +73,7 @@ Although the details on making Apache Nifi work on Java 11 probably warrants its
 
 == Contact
 
-I would be interested to hear your thoughts on this and other topics. Feel free to link:/contact[get in touch]. 
+I would be interested to hear your thoughts on this and other topics. Feel free to https://www.devworx.co.uk/contact/index.html[get in touch]. 
 
 
 

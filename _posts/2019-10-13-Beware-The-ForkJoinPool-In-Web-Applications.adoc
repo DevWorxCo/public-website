@@ -95,7 +95,7 @@ For the source code used in this blog, please refer to: https://github.com/DevWo
 
 == Contact
 
-I would be interested to hear your thoughts on this and other topics. Feel free to link:/contact[get in touch]. 
+I would be interested to hear your thoughts on this and other topics. Feel free to https://www.devworx.co.uk/contact/index.html[get in touch]. 
 
 
 
