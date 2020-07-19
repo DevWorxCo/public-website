@@ -1,0 +1,76 @@
+---
+layout: post
+title: Easy XML to CSV Conversion
+date: 2020-07-19 08:00:00.000
+tags: [XML, CSV, Flattening, Rectangular-Data, XPath-Expression]
+author: jsteenkamp
+---
+
+Countless tools, libraries and algorithms in use today assume inputs are already structured as rectangular or tabular data sets defined in terms of rows and columns. While the nomenclature can vary depending on the domain it all essentially refers to the same paradigm.
+
+For instance if you are using machine learning libraries, columns are often referred to as _'features'_ while rows are expected to represent _'observations'_.
+
+Whatever the domain, the need to be able to take a messy, nested data structure such as XML and convert it into an easily digestible data set for the existing tools set remains.
+
+== Current Solutions
+
+A quick internet search will turn up of a number solutions that you soon realise are difficult to leverage. Broadly speaking, anyone attempting to flatten out XML to CSV comes across one or more of these challenges:
+
+* *The solution is too simplistic*. For instance, it lacks the ability to recursively expand out nested lists or customise attribute names.
+* *The solution is part of a larger _'framework'_ that cannot be used standalone.* https://docs.oracle.com/cd/B19306_01/server.102/b14200/functions228.htm[Oracle XMLTable] for instance, requires you to install the Oracle Database first.
+* *The solution is purpose built for a specific domain / XSD definition.* A good example is https://sonra.io/[Flexter], a tool which has purpose built implementations that are highly optimised for specific format conversions, e.g. https://sonra.io/2018/06/05/converting-fixml-to-sql-server/[FIXML to MS SQL Server].
+* *The solution is too expensive*. And the cost cannot be justified given the size of your project.
+
+== Introducing the XML-Flattener
+
+The XML Flattener (https://github.com/DevWorxCo/xml-flattener) is an open-source standalone tool with minimal dependencies that can quickly convert entire directories containing large numbers of XML files to a form that can be consumed by tools such as R Studio, Python Pandas or Excel.
+
+To run the "Hello World" example, you simply need to have https://adoptopenjdk.net/[Java 8 installed] and run the following commands (see https://github.com/DevWorxCo/xml-flattener[README.md file on GitHub])
+
+=== Linux
+[source]
+----
+git clone https://github.com/DevWorxCo/xml-flattener.git
+
+cd xml-flattener
+
+wget -P target https://www.devworx.co.uk/assets/jars/xml-flattener-exec.jar
+
+java -jar target/xml-flattener-exec.jar examples/Hello-World/hello-world.yml
+----
+
+=== Windows
+[source]
+----
+git clone https://github.com/DevWorxCo/xml-flattener.git
+
+cd xml-flattener
+
+curl -o target/xml-flattener-exec.jar --create-dirs https://www.devworx.co.uk/assets/jars/xml-flattener-exec.jar
+
+java -jar target/xml-flattener-exec.jar examples/Hello-World/hello-world.yml
+----
+
+The above commands will produce the `examples/Hello-World/output/continents-flattened.csv` file.
+
+image::/assets/posts/easy-xml-to-csv-conversion/flattened-csv-hello-world.png[Hello World CSV Output]
+
+== Contact
+
+I would be interested to hear your feedback on this and other topics. Feel free to https://www.devworx.co.uk/contact/index.html[get in touch]. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
